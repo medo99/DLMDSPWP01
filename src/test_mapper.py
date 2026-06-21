@@ -3,6 +3,7 @@ import pandas as pd
 
 
 class TestMapper:
+    __test__ = False
     def __init__(self, ideal_df, test_df, allowed_deviations):
         self.ideal_df = ideal_df
         self.test_df = test_df
