@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-class TestMapper:
+class Mapper:
     __test__ = False
     def __init__(self, ideal_df, test_df, allowed_deviations):
         self.ideal_df = ideal_df

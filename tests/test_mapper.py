@@ -1,7 +1,7 @@
 from src.data_loader import DataLoader
 from src.function_selector import FunctionSelector
 from src.deviation_calculator import DeviationCalculator
-from src.test_mapper import TestMapper
+from src.mapper import Mapper
 
 
 def test_mapped_count():
@@ -20,7 +20,7 @@ def test_mapped_count():
 
     allowed = calculator.calculate_allowed_deviations()
 
-    mapper = TestMapper(
+    mapper = Mapper(
         ideal_df,
         test_df,
         allowed

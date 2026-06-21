@@ -1,7 +1,7 @@
 ﻿from src.data_loader import DataLoader
 from src.function_selector import FunctionSelector
 from src.deviation_calculator import DeviationCalculator
-from src.test_mapper import TestMapper
+from src.mapper import Mapper
 from src.database_manager import DatabaseManager
 from src.plot_generator import PlotGenerator
 def main():
@@ -14,7 +14,7 @@ def main():
     calculator = DeviationCalculator(train_df, ideal_df, selected)
     allowed_deviations = calculator.calculate_allowed_deviations()
 
-    mapper = TestMapper(ideal_df, test_df, allowed_deviations)
+    mapper = Mapper(ideal_df, test_df, allowed_deviations)
     mapped_df = mapper.map_test_points()
 
     print(selected)
