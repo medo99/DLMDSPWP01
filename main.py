@@ -3,7 +3,7 @@ from src.function_selector import FunctionSelector
 from src.deviation_calculator import DeviationCalculator
 from src.test_mapper import TestMapper
 from src.database_manager import DatabaseManager
-
+from src.plot_generator import PlotGenerator
 def main():
     loader = DataLoader()
     train_df, ideal_df, test_df = loader.load_data()
@@ -28,6 +28,14 @@ def main():
     db_manager.save_dataframe(mapped_df, "mapped_results")
 
     print("Data saved to SQLite database.")
+    plot_generator = PlotGenerator()
+    plot_path = plot_generator.create_plot(
+        train_df,
+        ideal_df,
+        mapped_df,
+        selected,
+    )
 
+    print(f"Visualization saved to {plot_path}")
 if __name__ == "__main__":
     main()
