@@ -10,9 +10,9 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Project data
+# Private assignment input data
 data/raw/*.csv
-data/processed/*.csv
+!data/raw/.gitkeep
 
 # Generated output
 output/*
@@ -23,12 +23,10 @@ output/*
 *.sqlite
 *.sqlite3
 
-# IDE and editor files
+# IDE/editor and OS files
 .idea/
 .vscode/
 *.code-workspace
 *.swp
-
-# Operating system files
 .DS_Store
 Thumbs.db

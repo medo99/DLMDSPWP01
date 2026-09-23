@@ -1,0 +1,16 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad=0.2, nodesep=0.35, ranksep=0.45];
+  node [shape=box, style="rounded", fontname="Arial", fontsize=11, margin="0.12,0.08"];
+  edge [fontname="Arial", fontsize=9, arrowsize=0.7];
+  A [label="Load train.csv and ideal.csv"];
+  B [label="Validate schema, numeric values,\nmissing values, x uniqueness and x-domain"];
+  C [label="Persist training_data and ideal_functions\nto SQLite via SQLAlchemy"];
+  D [label="Select one ideal function for each training function\nusing minimum SSE"];
+  E [label="Calculate max residual and allowed deviation\n= sqrt(2) × max residual"];
+  F [label="Stream test.csv line by line"];
+  G [label="Evaluate each test point against the four thresholds"];
+  H [label="If multiple functions qualify, choose\nthe smallest absolute y-deviation"];
+  I [label="Persist x, y, delta_y and ideal_function\nto mapped_results"];
+  J [label="Generate Bokeh visualizations and run test suite"];
+  A->B->C->D->E->F->G->H->I->J;
+}

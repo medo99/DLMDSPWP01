@@ -1,41 +1,64 @@
-﻿from src.data_loader import DataLoader
-from src.function_selector import FunctionSelector
-from src.deviation_calculator import DeviationCalculator
-from src.mapper import Mapper
+"""Run the complete DLMDSPWP01 assignment workflow."""
+
+from src.data_loader import DataLoader
+from src.data_validator import DataValidator
 from src.database_manager import DatabaseManager
+from src.deviation_calculator import DeviationCalculator
+from src.exceptions import ProjectError
+from src.function_selector import FunctionSelector
+from src.mapper import Mapper
 from src.plot_generator import PlotGenerator
-def main():
-    loader = DataLoader()
-    train_df, ideal_df, test_df = loader.load_data()
 
-    selector = FunctionSelector(train_df, ideal_df)
-    selected = selector.find_best_functions()
 
-    calculator = DeviationCalculator(train_df, ideal_df, selected)
-    allowed_deviations = calculator.calculate_allowed_deviations()
+def main() -> int:
+    """Execute validation, persistence, fitting, mapping, visualization and reporting."""
+    database_manager = DatabaseManager()
+    try:
+        loader = DataLoader()
+        train_df, ideal_df = loader.load_training_and_ideal()
 
-    mapper = Mapper(ideal_df, test_df, allowed_deviations)
-    mapped_df = mapper.map_test_points()
+        validator = DataValidator()
+        validator.validate_training_and_ideal(train_df, ideal_df)
 
-    print(selected)
-    print(allowed_deviations)
-    print(mapped_df.head())
-    print("Mapped count:", len(mapped_df))
-    db_manager = DatabaseManager()
+        # The assignment specifies that training and ideal data are loaded into SQLite
+        # before the test dataset is processed line-by-line.
+        database_manager.save_input_tables(train_df, ideal_df)
 
-    db_manager.save_dataframe(train_df, "training_data")
-    db_manager.save_dataframe(ideal_df, "ideal_functions")
-    db_manager.save_dataframe(mapped_df, "mapped_results")
+        selector = FunctionSelector(train_df, ideal_df)
+        selected = selector.find_best_functions()
 
-    print("Data saved to SQLite database.")
-    plot_generator = PlotGenerator()
-    plot_path = plot_generator.create_plot(
-        train_df,
-        ideal_df,
-        mapped_df,
-        selected,
-    )
+        calculator = DeviationCalculator(train_df, ideal_df, selected)
+        allowed_deviations = calculator.calculate_allowed_deviations()
 
-    print(f"Visualization saved to {plot_path}")
+        mapper = Mapper(ideal_df, allowed_deviations)
+        test_df, mapped_df = mapper.map_test_rows(loader.iter_test_rows())
+        database_manager.save_mapped_results(mapped_df)
+
+        plot_path = PlotGenerator().create_plot(
+            train_df=train_df,
+            ideal_df=ideal_df,
+            test_df=test_df,
+            mapped_df=mapped_df,
+            selected_functions=selected,
+            allowed_deviations=allowed_deviations,
+        )
+
+        print("Selected ideal functions:")
+        for train_column, info in selected.items():
+            print(
+                f"  {train_column} -> {info['ideal_function']} "
+                f"(SSE={float(info['sse']):.12f})"
+            )
+        print(f"Mapped test observations: {len(mapped_df)} of {len(test_df)}")
+        print(f"SQLite database: {database_manager.database_path}")
+        print(f"Bokeh visualization: {plot_path}")
+        return 0
+    except ProjectError as exc:
+        print(f"Project error: {exc}")
+        return 1
+    finally:
+        database_manager.dispose()
+
+
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

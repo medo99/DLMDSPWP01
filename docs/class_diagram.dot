@@ -1,0 +1,23 @@
+digraph UML {
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.35, ranksep=0.4];
+  node [shape=record, fontname="Arial", fontsize=9, margin="0.08,0.05"];
+  edge [fontname="Arial", fontsize=8, arrowsize=0.65];
+
+  BP [label="{BaseProcessor|+ _require_columns()\l+ _require_non_empty()\l+ _require_complete_numeric()\l}"];
+  DV [label="{DataValidator|+ validate_training_and_ideal()\l}"];
+  DL [label="{DataLoader|+ load_training_and_ideal()\l+ iter_test_rows()\l}"];
+  FS [label="{FunctionSelector|+ find_best_functions()\l}"];
+  DC [label="{DeviationCalculator|+ calculate_allowed_deviations()\l}"];
+  MP [label="{Mapper|+ map_test_rows()\l}"];
+  DB [label="{DatabaseManager|+ save_input_tables()\l+ save_mapped_results()\l+ dispose()\l}"];
+  PG [label="{PlotGenerator|+ create_plot()\l}"];
+
+  DV -> BP [arrowhead=empty, label="inherits"];
+  DL -> DV [style=dashed, label="data"];
+  FS -> DC [style=dashed, label="selected functions"];
+  DC -> MP [style=dashed, label="thresholds"];
+  DL -> MP [style=dashed, label="test rows"];
+  MP -> DB [style=dashed, label="mapped results"];
+  MP -> PG [style=dashed, label="test + mapped data"];
+  FS -> PG [style=dashed, label="selected pairs"];
+}
